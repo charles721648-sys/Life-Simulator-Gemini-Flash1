@@ -1,0 +1,1214 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>現代地球人生模擬器 | 80億分之一的隨機投胎</title>
+    <!-- 載入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 載入 Google Fonts: Noto Sans TC & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Inter"', '"Noto Sans TC"', 'sans-serif'],
+                    },
+                    colors: {
+                        editorial: {
+                            bg: '#F8F9FA',
+                            card: '#FFFFFF',
+                            ink: '#111827',
+                            muted: '#6B7280',
+                            border: '#E5E7EB',
+                            accent: '#2563EB',
+                        }
+                    },
+                    animation: {
+                        'slide-up': 'slideUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                        'float-up': 'floatUp 1.2s ease-out forwards',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        slideUp: {
+                            '0%': { opacity: '0', transform: 'translateY(18px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        floatUp: {
+                            '0%': { opacity: '1', transform: 'translateY(0) scale(1)' },
+                            '100%': { opacity: '0', transform: 'translateY(-22px) scale(1.1)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* 自定義細節與捲軸美化 */
+        body {
+            background-color: #F3F4F6;
+            color: #111827;
+            -webkit-tap-highlight-color: transparent;
+            overflow-x: hidden;
+        }
+        
+        /* 隱藏捲軸但保留滾動功能 */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* 玻璃擬態頂部狀態列 */
+        .glass-header {
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        /* 卡片微陰影 */
+        .editorial-shadow {
+            box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05), 0 1px 3px 0 rgba(0, 0, 0, 0.03);
+        }
+
+        /* 選項按鈕互動微動畫 */
+        .choice-btn {
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .choice-btn:active:not(:disabled) {
+            transform: scale(0.98);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-between antialiased selection:bg-blue-100 selection:text-blue-900">
+
+    <!-- ==================== 1. 開始畫面 (Landing Screen) ==================== -->
+    <div id="start-screen" class="w-full max-w-xl min-h-screen flex flex-col justify-between p-6 sm:p-10 mx-auto">
+        <header class="pt-4 flex items-center justify-between">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-gray-200 text-xs font-semibold text-gray-600 shadow-sm">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                EARTH POPULATION: ~8,180,000,000
+            </div>
+            <span class="text-xs font-mono text-gray-400">v2.6 EDITION</span>
+        </header>
+
+        <main class="my-auto py-8">
+            <div class="mb-6 inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gray-900 text-white text-3xl shadow-lg">
+                🌍
+            </div>
+            <h1 class="text-4xl sm:text-5xl font-black tracking-tight text-gray-900 leading-[1.15] mb-4">
+                現代地球<br>人生模擬器
+            </h1>
+            <p class="text-base sm:text-lg text-gray-600 leading-relaxed mb-8">
+                如果現在重新隨機投胎，你有多少機率出生在有冷氣吹的房間？<br class="hidden sm:inline">
+                這不是爽文劇本，而是一場依據<span class="font-bold text-gray-900 underline decoration-blue-500 decoration-2 underline-offset-4">真實全球人口比例</span>展開的生存隨機實驗。
+            </p>
+
+            <!-- 特色數據預覽卡片 -->
+            <div class="grid grid-cols-3 gap-3 mb-8">
+                <div class="bg-white p-3.5 rounded-2xl border border-gray-200/80 editorial-shadow">
+                    <div class="text-xs text-gray-400 font-medium mb-1">南亞與撒哈拉</div>
+                    <div class="text-lg sm:text-xl font-extrabold text-gray-900">~40%</div>
+                    <div class="text-[11px] text-gray-500 mt-0.5">全球最大出生比例</div>
+                </div>
+                <div class="bg-white p-3.5 rounded-2xl border border-gray-200/80 editorial-shadow">
+                    <div class="text-xs text-gray-400 font-medium mb-1">東亞內卷圈</div>
+                    <div class="text-lg sm:text-xl font-extrabold text-gray-900">~20%</div>
+                    <div class="text-[11px] text-gray-500 mt-0.5">升學與房價考驗</div>
+                </div>
+                <div class="bg-white p-3.5 rounded-2xl border border-gray-200/80 editorial-shadow">
+                    <div class="text-xs text-gray-400 font-medium mb-1">歐美高福利</div>
+                    <div class="text-lg sm:text-xl font-extrabold text-gray-900">~12%</div>
+                    <div class="text-[11px] text-gray-500 mt-0.5">SSR 級別開局</div>
+                </div>
+            </div>
+
+            <button onclick="startNewLife()" class="w-full py-4 px-6 rounded-2xl bg-gray-900 hover:bg-gray-800 text-white font-bold text-lg shadow-xl shadow-gray-900/15 transition-all transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-3 cursor-pointer">
+                <span>🎲 開始隨機投胎</span>
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
+            </button>
+        </main>
+
+        <footer class="pb-2 text-center text-xs text-gray-400">
+            警告：本模擬器包含通膨、裁員、升學壓力與不可抗力之現實打擊。
+        </footer>
+    </div>
+
+    <!-- ==================== 2. 遊戲主畫面 (Gameplay Screen) ==================== -->
+    <div id="game-screen" class="hidden w-full max-w-xl min-h-screen flex flex-col mx-auto relative">
+        
+        <!-- 頂部固定屬性儀表板 (Sticky Header) -->
+        <header class="sticky top-0 z-30 glass-header border-b border-gray-200/80 px-4 py-3 sm:px-6 transition-all">
+            <!-- 第一排：年齡與出生地標籤 -->
+            <div class="flex items-center justify-between mb-3">
+                <div class="flex items-center gap-2.5">
+                    <div class="bg-gray-900 text-white px-3 py-1 rounded-xl font-black text-base sm:text-lg tracking-tight flex items-baseline gap-1">
+                        <span id="ui-age">0</span>
+                        <span class="text-xs font-normal text-gray-300">歲</span>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-1.5">
+                            <span id="ui-region-flag" class="text-base">🇹🇼</span>
+                            <span id="ui-region-name" class="font-bold text-sm text-gray-900 truncate max-w-[170px] sm:max-w-[240px]">載入中...</span>
+                        </div>
+                        <span id="ui-rarity-badge" class="inline-block text-[10px] font-bold px-1.5 py-0.2 rounded bg-gray-100 text-gray-600">SSR</span>
+                    </div>
+                </div>
+
+                <!-- 快速重開按鈕 -->
+                <button onclick="confirmRestart()" title="放棄這輩子並重開" class="p-2 rounded-xl text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors text-xs font-medium flex items-center gap-1 cursor-pointer">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                    <span class="hidden sm:inline">重開</span>
+                </button>
+            </div>
+
+            <!-- 第二排：四維屬性條 -->
+            <div class="grid grid-cols-4 gap-2 sm:gap-3">
+                <!-- 健康 -->
+                <div class="relative bg-gray-50/90 p-2 rounded-xl border border-gray-200/60">
+                    <div class="flex items-center justify-between text-xs mb-1">
+                        <span class="text-gray-500 font-medium">❤️ 健康</span>
+                        <span id="stat-health-val" class="font-bold text-gray-900">50</span>
+                    </div>
+                    <div class="w-full h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                        <div id="stat-health-bar" class="h-full bg-rose-500 transition-all duration-500 rounded-full" style="width: 50%"></div>
+                    </div>
+                    <div id="delta-health" class="absolute -top-2 right-1 text-xs font-black pointer-events-none"></div>
+                </div>
+
+                <!-- 財富 -->
+                <div class="relative bg-gray-50/90 p-2 rounded-xl border border-gray-200/60">
+                    <div class="flex items-center justify-between text-xs mb-1">
+                        <span class="text-gray-500 font-medium">💰 財富</span>
+                        <span id="stat-wealth-val" class="font-bold text-gray-900">50</span>
+                    </div>
+                    <div class="w-full h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                        <div id="stat-wealth-bar" class="h-full bg-amber-500 transition-all duration-500 rounded-full" style="width: 50%"></div>
+                    </div>
+                    <div id="delta-wealth" class="absolute -top-2 right-1 text-xs font-black pointer-events-none"></div>
+                </div>
+
+                <!-- 快樂 -->
+                <div class="relative bg-gray-50/90 p-2 rounded-xl border border-gray-200/60">
+                    <div class="flex items-center justify-between text-xs mb-1">
+                        <span class="text-gray-500 font-medium">😊 快樂</span>
+                        <span id="stat-happiness-val" class="font-bold text-gray-900">50</span>
+                    </div>
+                    <div class="w-full h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                        <div id="stat-happiness-bar" class="h-full bg-sky-500 transition-all duration-500 rounded-full" style="width: 50%"></div>
+                    </div>
+                    <div id="delta-happiness" class="absolute -top-2 right-1 text-xs font-black pointer-events-none"></div>
+                </div>
+
+                <!-- 學識 -->
+                <div class="relative bg-gray-50/90 p-2 rounded-xl border border-gray-200/60">
+                    <div class="flex items-center justify-between text-xs mb-1">
+                        <span class="text-gray-500 font-medium">🧠 學識</span>
+                        <span id="stat-intelligence-val" class="font-bold text-gray-900">50</span>
+                    </div>
+                    <div class="w-full h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                        <div id="stat-intelligence-bar" class="h-full bg-indigo-500 transition-all duration-500 rounded-full" style="width: 50%"></div>
+                    </div>
+                    <div id="delta-intelligence" class="absolute -top-2 right-1 text-xs font-black pointer-events-none"></div>
+                </div>
+            </div>
+        </header>
+
+        <!-- 中央時間軸事件流 (Timeline Stream) -->
+        <main id="timeline-container" class="flex-1 px-4 sm:px-6 pt-6 pb-44 space-y-5 overflow-y-auto">
+            <!-- 卡片將透過 JS 動態插入此處 -->
+        </main>
+
+        <!-- 底部固定操作區 (Action Dock) -->
+        <div id="action-dock" class="fixed bottom-0 left-0 right-0 z-20 pointer-events-none">
+            <div class="max-w-xl mx-auto p-4 sm:p-6 bg-gradient-to-t from-[#F3F4F6] via-[#F3F4F6]/95 to-transparent pointer-events-auto">
+                <!-- 單一推進按鈕（當無分支選項時顯示） -->
+                <div id="next-btn-wrapper">
+                    <button id="next-age-btn" onclick="advanceLife()" class="w-full py-4 px-6 rounded-2xl bg-gray-900 hover:bg-gray-800 text-white font-bold text-base sm:text-lg shadow-xl shadow-gray-900/15 transition-all active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer">
+                        <span id="next-btn-text">繼續成長 (+3 歲)</span>
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                </div>
+
+                <!-- 選項容器（當遇到人生抉擇時顯示） -->
+                <div id="choices-wrapper" class="hidden space-y-2.5">
+                    <div class="text-xs font-bold text-gray-500 uppercase tracking-wider px-1 flex items-center gap-1.5">
+                        <span class="w-2 h-2 rounded-full bg-blue-600 animate-ping"></span>
+                        人生關鍵抉擇 — 請選擇你的方向
+                    </div>
+                    <div id="choices-list" class="space-y-2">
+                        <!-- 選項按鈕由 JS 生成 -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 自定義確認放棄 Modal (取代 window.confirm) -->
+        <div id="restart-modal" class="hidden fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
+            <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl animate-slide-up">
+                <h3 class="text-lg font-black text-gray-900 mb-2">確定要提前結束這輩子嗎？</h3>
+                <p class="text-sm text-gray-600 mb-6">目前的進度將會直接結算，並重新進行全球隨機投胎。</p>
+                <div class="flex gap-3">
+                    <button onclick="closeRestartModal()" class="flex-1 py-3 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold text-sm transition-colors cursor-pointer">繼續活下去</button>
+                    <button onclick="executeRestart()" class="flex-1 py-3 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-sm transition-colors cursor-pointer">立刻重開</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== 3. 人生終點結算畫面 (Summary Screen) ==================== -->
+    <div id="summary-screen" class="hidden w-full max-w-xl min-h-screen p-5 sm:p-8 mx-auto flex flex-col justify-between">
+        <div class="bg-white rounded-3xl border border-gray-200/90 editorial-shadow overflow-hidden animate-slide-up">
+            <!-- 檔案卡頂部深色橫幅 -->
+            <div class="bg-gray-900 text-white p-6 sm:p-8 relative overflow-hidden">
+                <div class="absolute -right-6 -top-6 text-8xl opacity-10 select-none">🌍</div>
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-xs font-semibold text-gray-200 mb-4">
+                    <span>EARTH CITIZEN ARCHIVE</span>
+                    <span>•</span>
+                    <span id="sum-id">#8180-XXXX</span>
+                </div>
+                <h2 class="text-2xl sm:text-3xl font-black tracking-tight mb-1" id="sum-title">平凡的地球倖存者</h2>
+                <p class="text-sm text-gray-300" id="sum-subtitle">享年 78 歲 • 台灣一般雙薪小康家庭</p>
+            </div>
+
+            <!-- 檔案卡主體數據 -->
+            <div class="p-6 sm:p-8 space-y-6">
+                <!-- 死因 / 結局敘述 -->
+                <div class="p-4 rounded-2xl bg-gray-50 border border-gray-200/80">
+                    <div class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">人生終章</div>
+                    <p id="sum-death-reason" class="text-sm sm:text-base text-gray-800 font-medium leading-relaxed">
+                        你在睡夢中安詳離世，結束了這段普通卻真實的地球旅程。
+                    </p>
+                </div>
+
+                <!-- 全球人口超越比例 -->
+                <div class="flex items-center justify-between p-4 rounded-2xl bg-blue-50/70 border border-blue-100">
+                    <div>
+                        <div class="text-xs font-bold text-blue-600 mb-0.5">綜合人生指數超越全球</div>
+                        <div class="text-xs text-blue-900/70">依據壽命、財富與幸福度加權計算</div>
+                    </div>
+                    <div class="text-3xl font-black text-blue-700" id="sum-percentile">68%</div>
+                </div>
+
+                <!-- 最終四維屬性長條圖 -->
+                <div>
+                    <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">最終人生狀態評估</h3>
+                    <div class="space-y-3">
+                        <div>
+                            <div class="flex justify-between text-xs font-bold mb-1">
+                                <span class="text-gray-700">❤️ 晚年健康狀態</span>
+                                <span id="sum-health-num" class="text-gray-900">40 / 100</span>
+                            </div>
+                            <div class="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+                                <div id="sum-health-bar" class="h-full bg-rose-500 rounded-full" style="width: 40%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-xs font-bold mb-1">
+                                <span class="text-gray-700">💰 累積資產水準</span>
+                                <span id="sum-wealth-num" class="text-gray-900">65 / 100</span>
+                            </div>
+                            <div class="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+                                <div id="sum-wealth-bar" class="h-full bg-amber-500 rounded-full" style="width: 65%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-xs font-bold mb-1">
+                                <span class="text-gray-700">😊 一生心理滿足度</span>
+                                <span id="sum-happiness-num" class="text-gray-900">72 / 100</span>
+                            </div>
+                            <div class="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+                                <div id="sum-happiness-bar" class="h-full bg-sky-500 rounded-full" style="width: 72%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-xs font-bold mb-1">
+                                <span class="text-gray-700">🧠 學識與社會歷練</span>
+                                <span id="sum-intelligence-num" class="text-gray-900">80 / 100</span>
+                            </div>
+                            <div class="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+                                <div id="sum-intelligence-bar" class="h-full bg-indigo-500 rounded-full" style="width: 80%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 人生關鍵大事紀摘要 -->
+                <div>
+                    <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">一生關鍵節點回顧</h3>
+                    <div id="sum-highlights" class="space-y-2.5 text-sm text-gray-700 border-l-2 border-gray-200 pl-3.5">
+                        <!-- 關鍵事件由 JS 填入 -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 底部按鈕組 -->
+        <div class="mt-6 flex flex-col sm:flex-row gap-3 pb-4">
+            <button onclick="copyResultSummary()" id="copy-btn" class="flex-1 py-3.5 px-5 rounded-2xl bg-white hover:bg-gray-50 text-gray-900 border border-gray-300 font-bold text-sm shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer">
+                <span>📋 複製人生戰績分享</span>
+            </button>
+            <button onclick="startNewLife()" class="flex-1 py-3.5 px-5 rounded-2xl bg-gray-900 hover:bg-gray-800 text-white font-bold text-sm shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer">
+                <span>🔄 再次隨機投胎</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- 輕量提示 Toast (取代 alert) -->
+    <div id="toast" class="fixed top-5 left-1/2 -translate-x-1/2 z-50 bg-gray-900 text-white text-xs font-bold px-4 py-2.5 rounded-full shadow-lg opacity-0 pointer-events-none transition-opacity duration-300">
+        已複製到剪貼簿！
+    </div>
+
+    <!-- ==================== 核心遊戲邏輯 (JavaScript) ==================== -->
+    <script>
+        /**
+         * 1. 全球真實人口比例開局資料庫 (Origins Database)
+         * weight 代表相對機率權重，貼近真實世界新生兒分佈
+         */
+        const ORIGINS = [
+            {
+                id: 'south_asia_urban',
+                name: '南亞發展中大都市家庭',
+                flag: '🇮🇳',
+                weight: 22,
+                rarity: 'COMMON • 22%',
+                rarityColor: 'bg-stone-200 text-stone-700',
+                stats: { health: 42, wealth: 28, happiness: 55, intelligence: 45 },
+                desc: '你出生在南亞人口稠密的熱鬧城市邊緣。空氣中瀰漫著香料、汽機車廢氣與雨季泥土的味道。家裡並不富裕，停電與缺水是家常便飯，但父母深信「知識改變命運」，節衣縮食也想送你去唸英文學校。'
+            },
+            {
+                id: 'sub_saharan_rural',
+                name: '撒哈拉以南農村大家庭',
+                flag: '🇳🇬',
+                weight: 18,
+                rarity: 'COMMON • 18%',
+                rarityColor: 'bg-amber-100 text-amber-800',
+                stats: { health: 35, wealth: 18, happiness: 62, intelligence: 30 },
+                desc: '你誕生在非洲廣袤紅土高原的村落裡，有五個兄弟姊妹。這裡沒有穩定的電網，最近的小學要走四公里路，但鄰里之間充滿歌聲與互助。你的童年與大自然為伍，也必須提早面對傳染病與乾旱的考驗。'
+            },
+            {
+                id: 'east_asia_exam',
+                name: '東亞高壓升學中產家庭',
+                flag: '🇰🇷',
+                weight: 16,
+                rarity: 'UNCOMMON • 16%',
+                rarityColor: 'bg-blue-100 text-blue-800',
+                stats: { health: 58, wealth: 55, happiness: 38, intelligence: 68 },
+                desc: '你出生在東亞高度現代化的鋼筋叢林裡。基礎建設與治安極佳，但你還沒學會走路，父母就已經在研究學區房與補習班名單。「不能輸在起跑點」是你這輩子聽到的第一句人生箴言。'
+            },
+            {
+                id: 'sea_developing',
+                name: '東南亞新興製造業城鎮家庭',
+                flag: '🇻🇳',
+                weight: 14,
+                rarity: 'UNCOMMON • 14%',
+                rarityColor: 'bg-emerald-100 text-emerald-800',
+                stats: { health: 50, wealth: 38, happiness: 60, intelligence: 48 },
+                desc: '你出生在充滿機車引擎聲與經濟活力的東南亞城鎮。父母在工業區與小攤販之間忙碌奔波，國家正處於經濟起飛期，到處都在蓋新大樓，機會很多，但社會安全網還很薄弱。'
+            },
+            {
+                id: 'latam_metro',
+                name: '拉丁美洲大都市邊緣社區',
+                flag: '🇧🇷',
+                weight: 10,
+                rarity: 'RARE • 10%',
+                rarityColor: 'bg-orange-100 text-orange-800',
+                stats: { health: 48, wealth: 32, happiness: 68, intelligence: 44 },
+                desc: '你出生在熱情奔放卻貧富差距極大的拉美大城。山坡上是色彩繽紛的磚瓦自建房，山腳下則是高級購物中心。足球、音樂與派對是生活最好的止痛藥，儘管街頭治安總是讓人提心吊膽。'
+            },
+            {
+                id: 'taiwan_middle',
+                name: '台灣一般雙薪小康家庭',
+                flag: '🇹🇼',
+                weight: 7,
+                rarity: 'RARE • 7%',
+                rarityColor: 'bg-teal-100 text-teal-800',
+                stats: { health: 68, wealth: 56, happiness: 52, intelligence: 62 },
+                desc: '你出生在台灣六都的公寓大樓裡。擁有全球頂尖的健保制度、24小時便利商店與穩定的治安。父母是朝九晚五的上班族，日子還算安穩，但高房價與低薪結構的陰影正默默在前方等著你。'
+            },
+            {
+                id: 'silicon_valley',
+                name: '北美矽谷雙薪科技家庭',
+                flag: '🇺🇸',
+                weight: 6,
+                rarity: 'EPIC • 6%',
+                rarityColor: 'bg-purple-100 text-purple-800',
+                stats: { health: 72, wealth: 82, happiness: 58, intelligence: 72 },
+                desc: '你出生在加州陽光普照的獨棟木屋裡。父母都在大型科技公司工作，家裡不缺最新款電子產品與私立教育資源。你站在全球資本與科技浪潮的最前線，唯一的隱憂是驚人的醫療帳單與同儕競爭。'
+            },
+            {
+                id: 'nordic_welfare',
+                name: '北歐高福利社會中產家庭',
+                flag: '🇸🇪',
+                weight: 4,
+                rarity: 'SSR • 4%',
+                rarityColor: 'bg-indigo-600 text-white',
+                stats: { health: 82, wealth: 74, happiness: 78, intelligence: 66 },
+                desc: '恭喜抽中地球頂級投胎券！你出生在斯堪地那維亞半島。從托育、大學學費到醫療幾乎全免，社會極度重視工作與生活平衡，唯一的代價是長達半年的酷寒黑夜，以及高達 50% 的所得稅。'
+            },
+            {
+                id: 'gulf_oil_wealth',
+                name: '中東產油國本國籍富裕家庭',
+                flag: '🇦🇪',
+                weight: 3,
+                rarity: 'SSR • 3%',
+                rarityColor: 'bg-amber-500 text-white',
+                stats: { health: 75, wealth: 92, happiness: 65, intelligence: 58 },
+                desc: '你出生在沙漠中拔地而起的黃金都市，擁有尊貴的本國籍身分。家裡有幫傭與司機，政府提供優渥津貼與免費海外留學獎學金，但你的人生軌跡也深受傳統家族規範與氣候極端高溫的制約。'
+            }
+        ];
+
+        /**
+         * 2. 年齡時間軸推進節點設定
+         */
+        const AGE_STEPS = [0, 3, 7, 12, 16, 18, 22, 26, 30, 35, 42, 50, 60, 70, 78, 85, 92, 100];
+
+        /**
+         * 3. 關鍵年齡分支抉擇庫 (Milestone Choices)
+         */
+        const MILESTONE_CHOICES = {
+            16: {
+                title: '青春期的十字路口',
+                text: '16 歲的你站在人生第一個分水嶺上。面對越來越沉重的學業與現實壓力，你決定怎麼度過接下來的幾年？',
+                choices: [
+                    {
+                        label: '📚 拚死刷題，把所有時間砸在課本與考試上',
+                        hint: '學識大幅提升，但快樂與健康受損',
+                        effect: { intelligence: 16, happiness: -12, health: -6 },
+                        resultText: '你過著每天只睡五小時、咖啡當水喝的日子，成功在同齡人中殺出一條血路。',
+                        tag: '成為卷王'
+                    },
+                    {
+                        label: '🎸 發展興趣與社交，享受青春才不管成績',
+                        hint: '快樂大幅提升，學識成長有限',
+                        effect: { happiness: 15, health: 5, intelligence: -4 },
+                        resultText: '你在社團與朋友之間如魚得水，雖然成績單不太好看，但這幾年成了你最懷念的時光。',
+                        tag: '自由靈魂'
+                    },
+                    {
+                        label: '🛠️ 提早學一技之長或打工貼補家用',
+                        hint: '財富與社會歷練小幅提升',
+                        effect: { wealth: 12, intelligence: 5, happiness: -4 },
+                        resultText: '你比同齡人更早體會到賺錢的辛苦與現實，但也提早存下了人生第一筆小積蓄。',
+                        tag: '早熟務實'
+                    }
+                ]
+            },
+            22: {
+                title: '步入成人世界的入場券',
+                text: '22 歲，無論你是否準備好，現實社會的大門已經推開。全球經濟正處於波動期，你的下一步是？',
+                choices: [
+                    {
+                        label: '💼 進入高壓高薪產業（科技/金融/大企業）',
+                        hint: '需學識 ≥ 60｜財富暴增，健康與快樂下滑',
+                        req: { stat: 'intelligence', min: 60 },
+                        effect: { wealth: 22, health: -12, happiness: -10, intelligence: 6 },
+                        resultText: '你成功擠進光鮮亮麗的產業，薪水讓人羨慕，但你的肝指數與訊息回覆速度也同步飆升。',
+                        tag: '高薪社畜'
+                    },
+                    {
+                        label: '🌱 選擇穩定普通的工作，留時間給生活',
+                        hint: '屬性均衡發展，較無大起大落',
+                        effect: { wealth: 8, happiness: 8, health: 4 },
+                        resultText: '你找了一份準時下班的工作，雖然買房依然遙遠，但至少週末是真正屬於你自己的。',
+                        tag: '平凡安穩'
+                    },
+                    {
+                        label: '🚀 孤注一擲創業，或前往異國闖蕩',
+                        hint: '高風險高回報，結果取決於運氣與學識',
+                        isGamble: true,
+                        resultText: '你打包行李踏上未知的冒險！',
+                        tag: '冒險家'
+                    }
+                ]
+            },
+            30: {
+                title: '三十而立的焦慮與選擇',
+                text: '30 歲，社群媒體上同齡人紛紛曬出婚禮、買房或升遷照。看著鏡子裡的自己，你決定把重心放在哪裡？',
+                choices: [
+                    {
+                        label: '💍 步入婚姻與家庭，承擔甜蜜的責任',
+                        hint: '快樂提升，財富開銷劇增',
+                        effect: { happiness: 14, wealth: -14, health: -3 },
+                        resultText: '你與伴侶組建了小家庭。柴米油鹽與帳單雖然讓人頭痛，但深夜回家時總有一盞燈為你亮著。',
+                        tag: '組建家庭'
+                    },
+                    {
+                        label: '📈 保持單身貴族，全力衝刺事業與投資',
+                        hint: '財富大幅提升，可能感到孤獨',
+                        effect: { wealth: 18, intelligence: 8, happiness: -6 },
+                        resultText: '你把所有精力投入在資產累積與自我提升上，銀行帳戶的數字給了你最大的安全感。',
+                        tag: '單身富豪預備軍'
+                    },
+                    {
+                        label: '🧘 拒絕社會時鐘，選擇躺平與身心療癒',
+                        hint: '健康與快樂回升，財富停滯',
+                        effect: { health: 12, happiness: 12, wealth: -6 },
+                        resultText: '你徹底看開了世俗的成功標準，開始規律運動、烹飪與閱讀，氣色比二十幾歲時還要好。',
+                        tag: '清醒生活家'
+                    }
+                ]
+            },
+            42: {
+                title: '中年風暴與轉折點',
+                text: '42 歲，體力開始明顯下滑，職場上也面臨 AI 自動化與年輕後輩的雙重夾擊。此時出現了一個轉機：',
+                choices: [
+                    {
+                        label: '🔄 跨領域轉職，學習新科技技能',
+                        hint: '需學識 ≥ 65｜成功抵禦中年危機',
+                        req: { stat: 'intelligence', min: 65 },
+                        effect: { wealth: 14, intelligence: 10, health: -5 },
+                        resultText: '憑藉多年的底蘊與學習力，你成功駕馭了新工具，成為團隊裡無可取代的資深顧問。',
+                        tag: '逆齡轉型'
+                    },
+                    {
+                        label: '🛡️ 守成保本，降低物慾並專注健康管理',
+                        hint: '健康大幅回升，財富穩健',
+                        effect: { health: 15, happiness: 8, wealth: 4 },
+                        resultText: '你戒掉了熬夜與垃圾食物，開始定期健檢與慢跑。你明白在這個年紀，健康才是最大的資產。',
+                        tag: '養生達人'
+                    },
+                    {
+                        label: '🎰 押注高風險金融商品，想趁退休前翻身',
+                        hint: '財富大幅波動，心臟要夠大顆',
+                        isGamble: true,
+                        resultText: '你將大半積蓄投入了市場波動之中……',
+                        tag: '金融賭徒'
+                    }
+                ]
+            },
+            60: {
+                title: '花甲之年的晚年規劃',
+                text: '60 歲，頭髮已經花白，身邊陸續傳來老朋友生病的消息。面對人生的下半場，你選擇如何度過？',
+                choices: [
+                    {
+                        label: '🌏 環遊世界與圓夢，把存下來的錢花在體驗上',
+                        hint: '需財富 ≥ 55｜快樂達到人生巔峰',
+                        req: { stat: 'wealth', min: 55 },
+                        effect: { happiness: 22, wealth: -18, health: 5 },
+                        resultText: '你背起行囊去看極光、逛遍世界各地的博物館，徹底彌補了年輕時沒時間看世界的遺憾。',
+                        tag: '圓夢旅人'
+                    },
+                    {
+                        label: '🏡 含飴弄孫或投入社區志工，過平靜生活',
+                        hint: '快樂與健康溫和提升',
+                        effect: { happiness: 12, health: 8 },
+                        resultText: '你在社區公園與鄰居下棋、種花，平靜而溫暖地享受著每一個晴朗的午後。',
+                        tag: '平靜晚年'
+                    },
+                    {
+                        label: '💻 退而不休，繼續工作或當顧問保持活躍',
+                        hint: '財富與學識維持高檔，略微勞累',
+                        effect: { wealth: 12, intelligence: 6, health: -6 },
+                        resultText: '你拒絕被貼上「老人」的標籤，依然活躍在專業領域，精神矍鑠得讓年輕人都自嘆不如。',
+                        tag: '不老松'
+                    }
+                ]
+            }
+        };
+
+        /**
+         * 4. 隨機事件池 (Random Events Pool)
+         * 依據年齡段與地區特性動態抽選
+         */
+        const RANDOM_EVENTS = [
+            // 童年 (3 ~ 12 歲)
+            { minAge: 3, maxAge: 12, text: '一場季節性流行病席捲了你所在的社區，你發了幾天高燒，幸好最後順利康復。', effect: { health: -6, happiness: -4 } },
+            { minAge: 3, maxAge: 12, text: '你在學校遇到了一位非常溫柔的老師，發現了你對閱讀與思考的興趣。', effect: { intelligence: 10, happiness: 8 } },
+            { minAge: 3, maxAge: 12, text: '家裡的經濟狀況因為父母加薪或收成變好而有所改善，你得到了夢寐以求的禮物！', effect: { wealth: 8, happiness: 12 } },
+            { minAge: 3, maxAge: 12, text: '跟鄰居小孩玩耍時不小心摔斷了手腕，打了好幾個月的石膏，但也因此成為班上的風雲人物。', effect: { health: -8, happiness: 4 } },
+            { minAge: 3, maxAge: 12, text: '極端氣候導致當地發生嚴重洪澇或熱浪，生活受到不小影響，讓你提早感受到大自然的威力。', effect: { health: -5, wealth: -6, happiness: -6 } },
+
+            // 青少年 (12 ~ 18 歲)
+            { minAge: 12, maxAge: 18, text: '智慧型手機與演算法徹底佔據了你的課餘時間，你的視力下降了，但網路迷因知識突飛猛進。', effect: { health: -6, intelligence: 4, happiness: 5 } },
+            { minAge: 12, maxAge: 18, text: '你經歷了人生第一次青澀的暗戀，雖然最後無疾而終，但寫滿日記本的青春讓你成長了不少。', effect: { happiness: -4, intelligence: 5 } },
+            { minAge: 12, maxAge: 18, text: '你在校際競賽或體育比賽中意外拿下了不錯的名次，自信心大幅膨脹！', effect: { happiness: 14, intelligence: 6 } },
+            { minAge: 12, maxAge: 18, text: '父母因為工作與經濟壓力爆發激烈爭吵，家裡的氣氛一度降到冰點。', effect: { happiness: -12, wealth: -5 } },
+
+            // 青年與壯年 (22 ~ 50 歲)
+            { minAge: 22, maxAge: 55, text: '全球爆發新一輪通貨膨脹，房租與物價齊飛，你的實質購買力縮水了一大截。', effect: { wealth: -12, happiness: -8 } },
+            { minAge: 22, maxAge: 55, text: 'AI 技術全面重塑職場！你因為提前學會利用自動化工具，工作效率翻倍並獲得主管賞識。', effect: { wealth: 14, intelligence: 8, happiness: 6 }, reqStat: { intelligence: 55 } },
+            { minAge: 22, maxAge: 55, text: '公司宣布組織重整與裁員，你不幸在名單之中，經歷了幾個月焦慮的投履歷與面試期。', effect: { wealth: -14, happiness: -14, health: -4 } },
+            { minAge: 22, maxAge: 55, text: '你在一次行業聚會或旅行中結識了志同道合的貴人，為你打開了全新的視野與人脈。', effect: { intelligence: 10, wealth: 10, happiness: 10 } },
+            { minAge: 22, maxAge: 55, text: '長期外食與久坐讓你的體檢報告出現紅字，醫生嚴肅警告你必須立刻改變生活習慣。', effect: { health: -12, happiness: -5 } },
+            { minAge: 22, maxAge: 55, text: '你隨手買的一支冷門股票或小額投資意外翻倍，雖然不足以退休，但夠你開心好幾個月！', effect: { wealth: 15, happiness: 12 } },
+            { minAge: 22, maxAge: 55, text: '一場突如其來的全球公共衛生事件迫使城市封鎖，你在家隔離了數週，重新思考人生的意義。', effect: { happiness: -8, health: -4, intelligence: 6 } },
+            { minAge: 22, maxAge: 55, text: '你領養了一隻流浪貓/狗，毛茸茸的陪伴治癒了你無數個加班後的深夜。', effect: { happiness: 16, wealth: -4, health: 4 } },
+
+            // 中老年 (50 ~ 100 歲)
+            { minAge: 50, maxAge: 100, text: '現代醫療技術的進步救了你一命！原本棘手的慢性病透過新療法得到了良好控制。', effect: { health: 12, wealth: -8 }, reqStat: { wealth: 45 } },
+            { minAge: 50, maxAge: 100, text: '一場突發的心血管疾病讓你進了急診室，雖然搶救回來，但體力大不如前。', effect: { health: -18, happiness: -8 } },
+            { minAge: 50, maxAge: 100, text: '你在整理舊物時翻出了年輕時的照片與信件，那些曾經以為過不去的坎，如今看來都成了微笑的回憶。', effect: { happiness: 15 } },
+            { minAge: 50, maxAge: 100, text: '遭遇了針對高齡族群的精密網路詐騙，所幸你在最後一刻警覺異常，只損失了小額金錢。', effect: { wealth: -8, intelligence: 4, happiness: -6 } },
+            { minAge: 50, maxAge: 100, text: '你開始學習繪畫、樂器或園藝，發現人生無論幾歲開始探索新事物都不算太晚。', effect: { happiness: 14, intelligence: 8, health: 5 } }
+        ];
+
+        /**
+         * 5. 遊戲全域狀態 (Game State)
+         */
+        let state = {
+            origin: null,
+            ageIndex: 0,
+            age: 0,
+            stats: { health: 50, wealth: 50, happiness: 50, intelligence: 50 },
+            history: [],      // 完整事件記錄
+            highlights: [],   // 關鍵轉折標籤與摘要
+            isDead: false,
+            deathReason: '',
+            pendingChoice: null
+        };
+
+        /**
+         * 工具函式：依據權重隨機抽選開局背景
+         */
+        function pickWeightedOrigin() {
+            const totalWeight = ORIGINS.reduce((sum, item) => sum + item.weight, 0);
+            let random = Math.random() * totalWeight;
+            for (const origin of ORIGINS) {
+                if (random < origin.weight) return origin;
+                random -= origin.weight;
+            }
+            return ORIGINS[0];
+        }
+
+        /**
+         * 工具函式：數值限制在 0 ~ 100 之間
+         */
+        function clamp(val, min = 0, max = 100) {
+            return Math.max(min, Math.min(max, Math.round(val)));
+        }
+
+        /**
+         * 核心流程：開始新的人生
+         */
+        function startNewLife() {
+            const origin = pickWeightedOrigin();
+            
+            // 加入微幅隨機波動 (-3 ~ +3) 讓同地區開局也有微妙差異
+            const jitter = () => Math.floor(Math.random() * 7) - 3;
+
+            state = {
+                origin: origin,
+                ageIndex: 0,
+                age: 0,
+                stats: {
+                    health: clamp(origin.stats.health + jitter(), 15, 95),
+                    wealth: clamp(origin.stats.wealth + jitter(), 10, 98),
+                    happiness: clamp(origin.stats.happiness + jitter(), 15, 95),
+                    intelligence: clamp(origin.stats.intelligence + jitter(), 15, 95),
+                },
+                history: [],
+                highlights: [],
+                isDead: false,
+                deathReason: '',
+                pendingChoice: null
+            };
+
+            // 切換畫面
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('summary-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('hidden');
+
+            // 初始化頂部 UI
+            document.getElementById('ui-region-flag').textContent = origin.flag;
+            document.getElementById('ui-region-name').textContent = origin.name;
+            const badge = document.getElementById('ui-rarity-badge');
+            badge.textContent = origin.rarity;
+            badge.className = `inline-block text-[10px] font-bold px-2 py-0.5 rounded-md ${origin.rarityColor}`;
+
+            // 清空時間軸與重置底部控制列
+            const timeline = document.getElementById('timeline-container');
+            timeline.innerHTML = '';
+            
+            updateStatsUI();
+            showNextButton();
+
+            // 插入 0 歲出生卡片
+            appendTimelineCard({
+                age: 0,
+                badge: '出生 • ORIGIN',
+                badgeColor: 'bg-gray-900 text-white',
+                title: `你降生在「${origin.name}」`,
+                text: origin.desc,
+                isHighlight: true
+            });
+
+            state.highlights.push(`0 歲：出生於${origin.name}`);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        /**
+         * 核心流程：推進人生時間軸
+         */
+        function advanceLife() {
+            if (state.isDead || state.pendingChoice) return;
+
+            state.ageIndex++;
+            if (state.ageIndex >= AGE_STEPS.length) {
+                triggerEndOfLife('百歲人瑞！你在平靜與眾人的祝福中走完了傳奇的一生。');
+                return;
+            }
+
+            const prevAge = state.age;
+            state.age = AGE_STEPS[state.ageIndex];
+            const ageDiff = state.age - prevAge;
+
+            // 自然衰老機制：50 歲後健康會隨年齡自然微幅下滑
+            if (state.age >= 50) {
+                const agingPenalty = state.age >= 70 ? -6 : -3;
+                applyStatChanges({ health: agingPenalty }, false);
+            }
+
+            // 檢查是否有預設的「人生關鍵抉擇」
+            if (MILESTONE_CHOICES[state.age]) {
+                const milestone = MILESTONE_CHOICES[state.age];
+                appendTimelineCard({
+                    age: state.age,
+                    badge: '關鍵抉擇 • DECISION',
+                    badgeColor: 'bg-blue-600 text-white',
+                    title: milestone.title,
+                    text: milestone.text,
+                    isDecision: true
+                });
+                renderChoices(milestone.choices);
+                updateStatsUI();
+                return;
+            }
+
+            // 否則觸發隨機事件
+            triggerRandomEvent();
+        }
+
+        /**
+         * 觸發隨機事件並計算結果
+         */
+        function triggerRandomEvent() {
+            // 篩選符合當前年齡段與屬性條件的事件
+            const eligible = RANDOM_EVENTS.filter(ev => {
+                if (state.age < ev.minAge || state.age > ev.maxAge) return false;
+                if (ev.reqStat) {
+                    const key = Object.keys(ev.reqStat)[0];
+                    if (state.stats[key] < ev.reqStat[key]) return false;
+                }
+                return true;
+            });
+
+            // 隨機挑選一個事件（避免連續重複）
+            let chosen = eligible[Math.floor(Math.random() * eligible.length)];
+            if (!chosen) {
+                chosen = { text: '這幾年風平浪靜，你在日常的瑣碎與微小的確幸中穩步前行。', effect: { happiness: 3, health: 1 } };
+            }
+
+            // 地區特性微調：若健康極低或財富極低，負面衝擊會更明顯
+            const effect = { ...chosen.effect };
+            if (state.origin.id === 'sub_saharan_rural' && effect.health < 0) {
+                effect.health -= 2; // 醫療資源較匱乏
+            }
+            if (state.origin.id === 'nordic_welfare' && effect.wealth < 0) {
+                effect.wealth = Math.ceil(effect.wealth * 0.6); // 社會安全網緩衝
+            }
+
+            applyStatChanges(effect, true);
+
+            // 判定是否因為健康歸零或高齡壽終
+            if (checkDeathCondition()) return;
+
+            appendTimelineCard({
+                age: state.age,
+                badge: '人生記事',
+                badgeColor: 'bg-gray-100 text-gray-600',
+                text: chosen.text,
+                effect: effect
+            });
+
+            // 若單次變化劇烈，記錄進人生亮點
+            const totalImpact = Object.values(effect).reduce((a, b) => a + Math.abs(b), 0);
+            if (totalImpact >= 18) {
+                state.highlights.push(`${state.age} 歲：${chosen.text.slice(0, 26)}...`);
+            }
+
+            updateStatsUI();
+            updateNextButtonLabel();
+        }
+
+        /**
+         * 渲染分支選項按鈕
+         */
+        function renderChoices(choices) {
+            state.pendingChoice = choices;
+            document.getElementById('next-btn-wrapper').classList.add('hidden');
+            const choicesWrapper = document.getElementById('choices-wrapper');
+            const choicesList = document.getElementById('choices-list');
+            
+            choicesWrapper.classList.remove('hidden');
+            choicesList.innerHTML = '';
+
+            choices.forEach((choice, idx) => {
+                // 檢查屬性門檻
+                let isLocked = false;
+                let lockReason = '';
+                if (choice.req) {
+                    const currentVal = state.stats[choice.req.stat];
+                    if (currentVal < choice.req.min) {
+                        isLocked = true;
+                        const statNames = { health: '健康', wealth: '財富', happiness: '快樂', intelligence: '學識' };
+                        lockReason = `需${statNames[choice.req.stat]} ≥ ${choice.req.min} (目前 ${currentVal})`;
+                    }
+                }
+
+                const btn = document.createElement('button');
+                btn.disabled = isLocked;
+                btn.className = `choice-btn w-full text-left p-3.5 rounded-2xl border transition-all flex flex-col gap-1 ${
+                    isLocked 
+                    ? 'bg-gray-100/80 border-gray-200 opacity-60 cursor-not-allowed' 
+                    : 'bg-white hover:bg-blue-50/50 border-gray-300 hover:border-blue-500 shadow-sm cursor-pointer'
+                }`;
+
+                btn.innerHTML = `
+                    <div class="flex items-center justify-between gap-2">
+                        <span class="font-bold text-sm text-gray-900">${choice.label}</span>
+                        ${isLocked ? `<span class="text-[11px] font-bold px-2 py-0.5 rounded bg-rose-100 text-rose-700 shrink-0">🔒 ${lockReason}</span>` : ''}
+                    </div>
+                    <div class="text-xs text-gray-500">${choice.hint}</div>
+                `;
+
+                if (!isLocked) {
+                    btn.onclick = () => selectChoice(choice);
+                }
+
+                choicesList.appendChild(btn);
+            });
+
+            scrollToBottom();
+        }
+
+        /**
+         * 處理玩家點擊選項後的結果
+         */
+        function selectChoice(choice) {
+            state.pendingChoice = null;
+            let effect = { ...(choice.effect || {}) };
+            let finalNarrative = choice.resultText;
+
+            // 若為高風險賭博型選項（創業/高風險投資）
+            if (choice.isGamble) {
+                const successChance = 0.42 + (state.stats.intelligence - 50) * 0.004;
+                if (Math.random() < successChance) {
+                    effect = { wealth: 28, happiness: 16, health: -6, intelligence: 8 };
+                    finalNarrative += ' 幸運女神站在你這邊！你的大膽決策獲得了豐厚回報，實現了階層躍遷。';
+                    state.highlights.push(`${state.age} 歲：【${choice.tag}】大獲成功`);
+                } else {
+                    effect = { wealth: -24, happiness: -16, health: -8 };
+                    finalNarrative += ' 現實給了你沉重一擊。市場風向突變，你賠光了大半積蓄，背負著壓力重新站起。';
+                    state.highlights.push(`${state.age} 歲：【${choice.tag}】遭遇重挫`);
+                }
+            } else {
+                state.highlights.push(`${state.age} 歲：選擇了「${choice.tag}」`);
+            }
+
+            applyStatChanges(effect, true);
+
+            if (checkDeathCondition()) return;
+
+            appendTimelineCard({
+                age: state.age,
+                badge: `抉擇結果 • ${choice.tag}`,
+                badgeColor: 'bg-emerald-100 text-emerald-800',
+                text: finalNarrative,
+                effect: effect
+            });
+
+            showNextButton();
+            updateStatsUI();
+            updateNextButtonLabel();
+        }
+
+        /**
+         * 套用屬性變化並觸發頂部浮動數字動畫
+         */
+        function applyStatChanges(effect, showFloating = true) {
+            if (!effect) return;
+            const keys = ['health', 'wealth', 'happiness', 'intelligence'];
+
+            keys.forEach(key => {
+                if (effect[key]) {
+                    const delta = effect[key];
+                    state.stats[key] = clamp(state.stats[key] + delta);
+
+                    if (showFloating) {
+                        const deltaEl = document.getElementById(`delta-${key}`);
+                        deltaEl.textContent = delta > 0 ? `+${delta}` : `${delta}`;
+                        deltaEl.className = `absolute -top-2 right-1 text-xs font-black pointer-events-none animate-float-up ${
+                            delta > 0 ? 'text-emerald-600' : 'text-rose-600'
+                        }`;
+                        // 重置動畫
+                        deltaEl.style.animation = 'none';
+                        deltaEl.offsetHeight; /* trigger reflow */
+                        deltaEl.style.animation = null;
+                    }
+                }
+            });
+        }
+
+        /**
+         * 檢查是否觸發死亡或自然壽終條件
+         */
+        function checkDeathCondition() {
+            // 1. 健康歸零 -> 提早離世
+            if (state.stats.health <= 0) {
+                const reasons = [
+                    '長期的過勞、壓力與健康透支終於壓垮了你的身體，你在醫院的病床上結束了這一生。',
+                    '一場突如其來的重病奪走了你的生命，你甚至還沒來得及完成心願清單上的最後幾件事。'
+                ];
+                triggerEndOfLife(reasons[Math.floor(Math.random() * reasons.length)]);
+                return true;
+            }
+
+            // 2. 70 歲以上高齡自然死亡機率檢定
+            if (state.age >= 70) {
+                // 健康越高，活越久的機率越高
+                const survivalChance = (state.stats.health / 100) * 0.85 - ((state.age - 70) * 0.022);
+                if (Math.random() > survivalChance) {
+                    const peacefulReasons = [
+                        `在 ${state.age} 歲的某個清晨，你在熟悉的床上安詳地閉上了眼睛，沒有痛苦，就像睡著了一樣。`,
+                        `走過了 ${state.age} 年的風風雨雨，你的生命之火在平靜與溫暖中緩緩熄滅。`
+                    ];
+                    triggerEndOfLife(peacefulReasons[Math.floor(Math.random() * peacefulReasons.length)]);
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /**
+         * 結束人生並生成結算報告
+         */
+        function triggerEndOfLife(reason) {
+            state.isDead = true;
+            state.deathReason = reason;
+            updateStatsUI();
+
+            // 在時間軸最後插入終章卡片
+            appendTimelineCard({
+                age: state.age,
+                badge: '人生終點 • THE END',
+                badgeColor: 'bg-rose-600 text-white',
+                title: `享年 ${state.age} 歲`,
+                text: reason,
+                isHighlight: true
+            });
+
+            // 底部按鈕切換為「查看人生結算檔案」
+            document.getElementById('choices-wrapper').classList.add('hidden');
+            document.getElementById('next-btn-wrapper').classList.remove('hidden');
+            const btn = document.getElementById('next-age-btn');
+            btn.className = 'w-full py-4 px-6 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-base sm:text-lg shadow-xl shadow-blue-600/20 transition-all flex items-center justify-center gap-2 cursor-pointer';
+            btn.onclick = renderSummaryScreen;
+            document.getElementById('next-btn-text').textContent = '📊 查看地球人生結算檔案';
+            
+            scrollToBottom();
+        }
+
+        /**
+         * 渲染人生終點結算檔案卡
+         */
+        function renderSummaryScreen() {
+            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('summary-screen').classList.remove('hidden');
+
+            const { age, stats, origin, deathReason, highlights } = state;
+
+            // 生成隨機公民編號
+            document.getElementById('sum-id').textContent = `#8180-${Math.floor(1000 + Math.random() * 9000)}`;
+            document.getElementById('sum-subtitle').textContent = `享年 ${age} 歲 • ${origin.flag} ${origin.name}`;
+            document.getElementById('sum-death-reason').textContent = deathReason;
+
+            // 計算人生稱號 (Title)
+            let lifeTitle = '平凡的地球倖存者';
+            if (age < 35) lifeTitle = '流星般短暫的過客';
+            else if (stats.wealth >= 80 && stats.happiness >= 70) lifeTitle = '地球人生贏家';
+            else if (stats.wealth >= 80 && stats.health <= 30) lifeTitle = '用命換錢的資本家';
+            else if (origin.stats.wealth <= 30 && stats.wealth >= 70) lifeTitle = '逆天改命的破局者';
+            else if (stats.intelligence >= 85) lifeTitle = '時代的思考者與學者';
+            else if (stats.happiness >= 80) lifeTitle = '知足常樂的幸福哲學家';
+            else if (age >= 85) lifeTitle = '見證時代變遷的長壽智者';
+
+            document.getElementById('sum-title').textContent = `《${lifeTitle}》`;
+
+            // 計算超越全球人口百分比
+            const rawScore = (age * 0.45) + (stats.wealth * 0.25) + (stats.happiness * 0.15) + (stats.intelligence * 0.15);
+            const percentile = clamp(Math.round((rawScore / 95) * 99), 5, 99);
+            document.getElementById('sum-percentile').textContent = `${percentile}%`;
+
+            // 填入最終四維長條圖
+            const statKeys = ['health', 'wealth', 'happiness', 'intelligence'];
+            statKeys.forEach(k => {
+                document.getElementById(`sum-${k}-num`).textContent = `${stats[k]} / 100`;
+                document.getElementById(`sum-${k}-bar`).style.width = `${stats[k]}%`;
+            });
+
+            // 填入人生大事紀摘要
+            const highlightsContainer = document.getElementById('sum-highlights');
+            highlightsContainer.innerHTML = '';
+            const displayHighlights = highlights.slice(0, 6);
+            displayHighlights.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'leading-snug';
+                div.textContent = item;
+                highlightsContainer.appendChild(div);
+            });
+
+            // 重置主畫面按鈕事件以備下次重開
+            const btn = document.getElementById('next-age-btn');
+            btn.className = 'w-full py-4 px-6 rounded-2xl bg-gray-900 hover:bg-gray-800 text-white font-bold text-base sm:text-lg shadow-xl shadow-gray-900/15 transition-all active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer';
+            btn.onclick = advanceLife;
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        /**
+         * UI 輔助：在時間軸新增一張事件卡片
+         */
+        function appendTimelineCard({ age, badge, badgeColor, title, text, effect, isHighlight, isDecision }) {
+            const container = document.getElementById('timeline-container');
+            const card = document.createElement('article');
+            
+            card.className = `p-5 rounded-3xl border transition-all animate-slide-up ${
+                isDecision 
+                ? 'bg-blue-50/60 border-blue-200 editorial-shadow' 
+                : isHighlight 
+                    ? 'bg-white border-gray-300 editorial-shadow' 
+                    : 'bg-white border-gray-200/80 editorial-shadow'
+            }`;
+
+            // 生成屬性變動標籤 pills
+            let pillsHtml = '';
+            if (effect) {
+                const map = {
+                    health: { label: '健康', icon: '❤️' },
+                    wealth: { label: '財富', icon: '💰' },
+                    happiness: { label: '快樂', icon: '😊' },
+                    intelligence: { label: '學識', icon: '🧠' }
+                };
+                const pills = Object.entries(effect)
+                    .filter(([_, val]) => val !== 0)
+                    .map(([k, val]) => {
+                        const isPos = val > 0;
+                        return `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-xs font-bold ${
+                            isPos ? 'bg-emerald-50 text-emerald-700 border border-emerald-200/60' : 'bg-rose-50 text-rose-700 border border-rose-200/60'
+                        }">${map[k].icon} ${map[k].label} ${isPos ? '+' + val : val}</span>`;
+                    });
+                if (pills.length > 0) {
+                    pillsHtml = `<div class="flex flex-wrap gap-1.5 mt-3 pt-3 border-t border-gray-100">${pills.join('')}</div>`;
+                }
+            }
+
+            card.innerHTML = `
+                <div class="flex items-center justify-between mb-2.5">
+                    <span class="font-black text-base text-gray-900">${age} 歲</span>
+                    <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full ${badgeColor}">${badge}</span>
+                </div>
+                ${title ? `<h3 class="font-bold text-base text-gray-900 mb-1.5">${title}</h3>` : ''}
+                <p class="text-sm sm:text-[15px] text-gray-700 leading-relaxed">${text}</p>
+                ${pillsHtml}
+            `;
+
+            container.appendChild(card);
+            scrollToBottom();
+        }
+
+        /**
+         * UI 輔助：更新頂部屬性數字與進度條
+         */
+        function updateStatsUI() {
+            document.getElementById('ui-age').textContent = state.age;
+            const keys = ['health', 'wealth', 'happiness', 'intelligence'];
+            keys.forEach(k => {
+                const val = state.stats[k];
+                document.getElementById(`stat-${k}-val`).textContent = val;
+                document.getElementById(`stat-${k}-bar`).style.width = `${val}%`;
+            });
+        }
+
+        function showNextButton() {
+            document.getElementById('choices-wrapper').classList.add('hidden');
+            document.getElementById('next-btn-wrapper').classList.remove('hidden');
+        }
+
+        function updateNextButtonLabel() {
+            const nextAge = AGE_STEPS[state.ageIndex + 1];
+            if (nextAge !== undefined) {
+                const diff = nextAge - state.age;
+                document.getElementById('next-btn-text').textContent = `繼續成長 (+${diff} 歲 → ${nextAge} 歲)`;
+            } else {
+                document.getElementById('next-btn-text').textContent = '迎向人生百歲終章';
+            }
+        }
+
+        function scrollToBottom() {
+            setTimeout(() => {
+                window.scrollTo({
+                    top: document.body.scrollHeight,
+                    behavior: 'smooth'
+                });
+            }, 60);
+        }
+
+        /**
+         * 自定義重新開始確認對話框
+         */
+        function confirmRestart() {
+            document.getElementById('restart-modal').classList.remove('hidden');
+        }
+
+        function closeRestartModal() {
+            document.getElementById('restart-modal').classList.add('hidden');
+        }
+
+        function executeRestart() {
+            closeRestartModal();
+            startNewLife();
+        }
+
+        /**
+         * 複製戰績分享文字 (使用 document.execCommand 確保相容性)
+         */
+        function copyResultSummary() {
+            const title = document.getElementById('sum-title').textContent;
+            const percentile = document.getElementById('sum-percentile').textContent;
+            const shareText = `🌍【現代地球人生模擬器】\n我隨機投胎到了「${state.origin.flag} ${state.origin.name}」\n享年 ${state.age} 歲，獲得稱號 ${title}！\n綜合人生指數超越了全球 ${percentile} 的人口。\n你敢來測測看這輩子會投胎到哪裡嗎？`;
+
+            const textArea = document.createElement('textarea');
+            textArea.value = shareText;
+            textArea.style.position = 'fixed';
+            textArea.style.left = '-9999px';
+            document.body.appendChild(textArea);
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                showToast('✅ 已複製人生戰績，快去分享給朋友吧！');
+            } catch (err) {
+                showToast('⚠️ 複製失敗，請手動截圖分享');
+            }
+            document.body.removeChild(textArea);
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.classList.remove('opacity-0');
+            setTimeout(() => {
+                toast.classList.add('opacity-0');
+            }, 2500);
+        }
+    </script>
+</body>
+</html>
